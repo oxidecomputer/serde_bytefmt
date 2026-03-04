@@ -63,6 +63,7 @@
 
 #![deny(missing_docs)]
 #![no_std]
+#![cfg_attr(doc_cfg, feature(doc_cfg))]
 
 #[cfg(feature = "alloc")]
 extern crate alloc;

@@ -10,8 +10,12 @@ rust-version = "1.85"
 keywords = ["serde", "serialization", "no_std", "bytes", "hex"]
 categories = ["encoding", "no-std"]
 
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(doc_cfg)"] }
+
 [package.metadata.docs.rs]
 all-features = true
+rustdoc-args = ["--cfg=doc_cfg"]
 
 [package.metadata.cargo-sync-rdme.badge.badges]
 license = true
