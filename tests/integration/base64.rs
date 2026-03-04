@@ -7,7 +7,7 @@ use serde_bytefmt::Base64Vec;
 
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 struct MyStruct {
-    #[serde(with = "serde_bytefmt::base64_vec")]
+    #[serde(with = "Base64Vec")]
     data: Vec<u8>,
 }
 

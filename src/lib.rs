@@ -18,7 +18,7 @@
 //! * [`Base64Vec`] encodes a variable-length byte vector as a base64 string.
 //!   (The `alloc` feature is required.)
 //!
-//! These types can be used directly as struct fielde, or be applied to
+//! These types can be used directly as struct fields, or be applied to
 //! existing `[u8; N]` / `Vec<u8>` fields via `#[serde(with = "...")]`.
 //!
 //! # Examples
@@ -68,12 +68,9 @@
 extern crate alloc;
 
 #[cfg(feature = "alloc")]
-pub mod base64_vec;
-#[cfg(feature = "alloc")]
-mod base64_vec_type;
-pub mod hex_array;
-mod hex_array_type;
+mod base64_vec;
+mod hex_array;
 
 #[cfg(feature = "alloc")]
-pub use base64_vec_type::Base64Vec;
-pub use hex_array_type::HexArray;
+pub use base64_vec::Base64Vec;
+pub use hex_array::HexArray;

@@ -9,7 +9,8 @@ cargo build
 cargo nextest run                  # all tests
 cargo clippy --all-targets         # lint
 cargo xfmt                         # check formatting (max_width=80, edition 2024)
-just powerset                      # test all feature combinations via cargo-hack
+just powerset nextest run          # test all feature combinations via cargo-hack
+just generate-readmes              # regenerate readme from lib.rs
 ```
 
 ## Architecture
@@ -26,4 +27,4 @@ Single-crate library providing serde adapters for byte arrays and vectors:
 - `no_std` by default; `alloc` feature enables `Base64Vec` and `HexArray` serialization.
 - `#![deny(missing_docs)]` enforced.
 - README generated from rustdoc via `cargo-sync-rdme`.
-- Each type has a public module (`hex_array`, `base64_vec`) with free functions, plus a newtype wrapper re-exported from the crate root.
+- Each type lives in a private module and is re-exported from the crate root.
