@@ -32,34 +32,27 @@ fn fixture() -> WithBase64VecAttr {
 }
 
 #[test]
-fn base64_serialize() {
+fn base64_serde_roundtrip() {
     let fixture = fixture();
 
-    assert_eq!(
-        serde_json::to_string(&fixture).expect("serializing as JSON succeeded"),
-        AS_JSON,
-        "JSON matched",
-    );
+    let json = serde_json::to_string(&fixture)
+        .expect("serializing as JSON succeeded");
+    assert_eq!(json, AS_JSON, "JSON matched");
 
-    let mut cbor_actual: Vec<u8> = Vec::new();
-    ciborium::ser::into_writer(&fixture, &mut cbor_actual)
-        .expect("writing to vec<u8> succeeded");
+    let json_roundtrip: WithBase64VecAttr =
+        serde_json::from_str(&json)
+            .expect("JSON roundtrip deserialization succeeded");
+    assert_eq!(fixture, json_roundtrip, "JSON roundtrip matched");
 
-    assert_eq!(cbor_actual, AS_CBOR, "CBOR matched");
-}
+    let mut cbor = Vec::new();
+    ciborium::ser::into_writer(&fixture, &mut cbor)
+        .expect("serializing as CBOR succeeded");
+    assert_eq!(cbor, AS_CBOR, "CBOR matched");
 
-#[test]
-fn base64_deserialize() {
-    let fixture = fixture();
-
-    let json_actual: WithBase64VecAttr = serde_json::from_str(AS_JSON)
-        .expect("deserializing from JSON succeeded");
-    assert_eq!(fixture, json_actual, "deserializing from JSON matched",);
-
-    let cbor_actual: WithBase64VecAttr =
-        ciborium::de::from_reader(&AS_CBOR[..])
-            .expect("deserializing from CBOR succeeded");
-    assert_eq!(fixture, cbor_actual, "deserializing from CBOR succeeded",);
+    let cbor_roundtrip: WithBase64VecAttr =
+        ciborium::de::from_reader(&cbor[..])
+            .expect("CBOR roundtrip deserialization succeeded");
+    assert_eq!(fixture, cbor_roundtrip, "CBOR roundtrip matched");
 }
 
 /// Test that `Base64Vec` can deserialize from a CBOR array

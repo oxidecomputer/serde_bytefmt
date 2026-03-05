@@ -25,28 +25,25 @@ static AS_JSON: &str = r#"{"x":"0123456789abcdef0123456789abcdef"}"#;
 static AS_CBOR: [u8; 20] = hex!("a16178500123456789abcdef0123456789abcdef");
 
 #[test]
-fn hex_serialize() {
-    assert_eq!(
-        serde_json::to_string(&FIXTURE).expect("serializing as JSON succeeded"),
-        AS_JSON,
-        "JSON matched",
-    );
-    let mut cbor_actual: Vec<u8> = Vec::new();
-    ciborium::ser::into_writer(&FIXTURE, &mut cbor_actual)
-        .expect("writing to vec<u8> succeeded");
+fn hex_serde_roundtrip() {
+    let json = serde_json::to_string(&FIXTURE)
+        .expect("serializing as JSON succeeded");
+    assert_eq!(json, AS_JSON, "JSON matched");
 
-    assert_eq!(cbor_actual, AS_CBOR, "CBOR matched");
-}
+    let json_roundtrip: WithHexArrayAttr =
+        serde_json::from_str(&json)
+            .expect("JSON roundtrip deserialization succeeded");
+    assert_eq!(FIXTURE, json_roundtrip, "JSON roundtrip matched");
 
-#[test]
-fn hex_deserialize() {
-    let json_actual: WithHexArrayAttr = serde_json::from_str(AS_JSON)
-        .expect("deserializing from JSON succeeded");
-    assert_eq!(FIXTURE, json_actual, "deserializing from JSON matched",);
+    let mut cbor = Vec::new();
+    ciborium::ser::into_writer(&FIXTURE, &mut cbor)
+        .expect("serializing as CBOR succeeded");
+    assert_eq!(cbor, AS_CBOR, "CBOR matched");
 
-    let cbor_actual: WithHexArrayAttr = ciborium::de::from_reader(&AS_CBOR[..])
-        .expect("deserializing from CBOR succeeded");
-    assert_eq!(FIXTURE, cbor_actual, "deserializing from CBOR succeeded",);
+    let cbor_roundtrip: WithHexArrayAttr =
+        ciborium::de::from_reader(&cbor[..])
+            .expect("CBOR roundtrip deserialization succeeded");
+    assert_eq!(FIXTURE, cbor_roundtrip, "CBOR roundtrip matched");
 }
 
 /// Test that `HexArray` can deserialize from a CBOR array
