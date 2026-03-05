@@ -182,3 +182,43 @@ fn base64_from_str_invalid_length() {
     let err = "A".parse::<Base64Vec>().expect_err("invalid length");
     assert_eq!(err, ParseBase64Error::InvalidLength { length: 1 });
 }
+
+// -- Display and Debug formatting tests --
+
+#[test]
+fn base64_display() {
+    let b = Base64Vec::new(vec![1, 2, 3]);
+    assert_eq!(format!("{b}"), "AQID");
+
+    // With padding.
+    let b = Base64Vec::new(vec![1, 2, 3, 4]);
+    assert_eq!(format!("{b}"), "AQIDBA==");
+
+    // Empty.
+    let b = Base64Vec::new(vec![]);
+    assert_eq!(format!("{b}"), "");
+
+    // Width and alignment.
+    let b = Base64Vec::new(vec![1, 2, 3]);
+    assert_eq!(format!("{b:>10}"), "      AQID");
+    assert_eq!(format!("{b:<10}"), "AQID      ");
+    assert_eq!(format!("{b:^10}"), "   AQID   ");
+    assert_eq!(format!("{b:_>10}"), "______AQID");
+
+    // Width smaller than content: no truncation.
+    assert_eq!(format!("{b:2}"), "AQID");
+}
+
+#[test]
+fn base64_debug() {
+    let b = Base64Vec::new(vec![1, 2, 3]);
+    assert_eq!(format!("{b:?}"), r#"Base64Vec("AQID")"#);
+
+    // Empty.
+    let b = Base64Vec::new(vec![]);
+    assert_eq!(format!("{b:?}"), r#"Base64Vec("")"#);
+
+    // Alternate flag.
+    let b = Base64Vec::new(vec![1, 2, 3]);
+    assert_eq!(format!("{b:#?}"), "Base64Vec(\n    \"AQID\",\n)",);
+}

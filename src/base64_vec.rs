@@ -280,11 +280,9 @@ where
 
 impl fmt::Debug for Base64Vec {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "Base64Vec({})",
-            base64::engine::general_purpose::STANDARD.encode(&self.0)
-        )
+        f.debug_tuple("Base64Vec")
+            .field(&base64::engine::general_purpose::STANDARD.encode(&self.0))
+            .finish()
     }
 }
 
