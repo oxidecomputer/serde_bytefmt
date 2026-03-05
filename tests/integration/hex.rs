@@ -289,3 +289,33 @@ fn hex_debug() {
     let h = HexArray::new([0xab, 0xcd]);
     assert_eq!(format!("{h:#?}"), "HexArray(\n    abcd,\n)");
 }
+
+#[test]
+fn hex_lower_hex() {
+    let h = HexArray::new([0x01, 0xAB, 0xFF]);
+    assert_eq!(format!("{h:x}"), "01abff");
+
+    // With padding.
+    assert_eq!(format!("{h:>10x}"), "    01abff");
+    assert_eq!(format!("{h:<10x}"), "01abff    ");
+    assert_eq!(format!("{h:_^10x}"), "__01abff__");
+
+    // Empty.
+    let empty = HexArray::new([]);
+    assert_eq!(format!("{empty:x}"), "");
+}
+
+#[test]
+fn hex_upper_hex() {
+    let h = HexArray::new([0x01, 0xab, 0xff]);
+    assert_eq!(format!("{h:X}"), "01ABFF");
+
+    // With padding.
+    assert_eq!(format!("{h:>10X}"), "    01ABFF");
+    assert_eq!(format!("{h:<10X}"), "01ABFF    ");
+    assert_eq!(format!("{h:_^10X}"), "__01ABFF__");
+
+    // Empty.
+    let empty = HexArray::new([]);
+    assert_eq!(format!("{empty:X}"), "");
+}

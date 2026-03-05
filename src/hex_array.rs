@@ -347,39 +347,63 @@ impl<const N: usize> fmt::Debug for HexArray<N> {
     }
 }
 
+/// Writes hex bytes with padding/alignment support.
+///
+/// `write_byte` is called for each byte in the array to allow
+/// callers to choose between lowercase and uppercase hex.
+fn fmt_hex_padded<const N: usize>(
+    bytes: &[u8; N],
+    f: &mut fmt::Formatter<'_>,
+    write_byte: fn(&mut fmt::Formatter<'_>, u8) -> fmt::Result,
+) -> fmt::Result {
+    let content_len = N * 2;
+
+    match f.width() {
+        Some(width) if width > content_len => {
+            let padding = width - content_len;
+            let fill = f.fill();
+            let (pre, post) = match f.align() {
+                Some(fmt::Alignment::Left) => (0, padding),
+                Some(fmt::Alignment::Right) | None => (padding, 0),
+                Some(fmt::Alignment::Center) => {
+                    (padding / 2, padding - padding / 2)
+                }
+            };
+            for _ in 0..pre {
+                f.write_char(fill)?;
+            }
+            for &byte in bytes {
+                write_byte(f, byte)?;
+            }
+            for _ in 0..post {
+                f.write_char(fill)?;
+            }
+            Ok(())
+        }
+        Some(_) | None => {
+            for &byte in bytes {
+                write_byte(f, byte)?;
+            }
+            Ok(())
+        }
+    }
+}
+
 impl<const N: usize> fmt::Display for HexArray<N> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let content_len = N * 2;
+        fmt_hex_padded(&self.0, f, |f, b| write!(f, "{b:02x}"))
+    }
+}
 
-        match f.width() {
-            Some(width) if width > content_len => {
-                let padding = width - content_len;
-                let fill = f.fill();
-                let (pre, post) = match f.align() {
-                    Some(fmt::Alignment::Left) => (0, padding),
-                    Some(fmt::Alignment::Right) | None => (padding, 0),
-                    Some(fmt::Alignment::Center) => {
-                        (padding / 2, padding - padding / 2)
-                    }
-                };
-                for _ in 0..pre {
-                    f.write_char(fill)?;
-                }
-                for byte in &self.0 {
-                    write!(f, "{byte:02x}")?;
-                }
-                for _ in 0..post {
-                    f.write_char(fill)?;
-                }
-                Ok(())
-            }
-            Some(_) | None => {
-                for byte in &self.0 {
-                    write!(f, "{byte:02x}")?;
-                }
-                Ok(())
-            }
-        }
+impl<const N: usize> fmt::LowerHex for HexArray<N> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt_hex_padded(&self.0, f, |f, b| write!(f, "{b:02x}"))
+    }
+}
+
+impl<const N: usize> fmt::UpperHex for HexArray<N> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt_hex_padded(&self.0, f, |f, b| write!(f, "{b:02X}"))
     }
 }
 
