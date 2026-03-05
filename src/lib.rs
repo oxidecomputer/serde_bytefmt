@@ -66,5 +66,5 @@ mod base64_vec;
 mod hex_array;
 
 #[cfg(feature = "alloc")]
-pub use base64_vec::Base64Vec;
+pub use base64_vec::{Base64Vec, ParseBase64Error};
 pub use hex_array::{HexArray, ParseHexError};

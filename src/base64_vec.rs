@@ -7,7 +7,7 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 use base64::Engine;
-use core::fmt;
+use core::{error, fmt, str::FromStr};
 use serde_core::{
     Deserializer, Serializer,
     de::{SeqAccess, Visitor},
@@ -116,6 +116,84 @@ impl Base64Vec {
         D: Deserializer<'de>,
     {
         deserialize_bytes(deserializer)
+    }
+}
+
+/// Error returned by [`Base64Vec::from_str`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ParseBase64Error {
+    /// An invalid byte was found at the given offset.
+    InvalidByte {
+        /// Byte offset of the invalid symbol.
+        offset: usize,
+        /// The invalid byte value.
+        byte: u8,
+    },
+    /// The input length (in valid base64 symbols) is invalid.
+    InvalidLength {
+        /// The invalid length.
+        length: usize,
+    },
+    /// The last non-padding symbol has nonzero trailing bits that
+    /// would be discarded, indicating corrupted or truncated input.
+    InvalidLastSymbol {
+        /// Byte offset of the invalid symbol.
+        offset: usize,
+        /// The invalid byte value.
+        byte: u8,
+    },
+    /// Padding was absent, incorrect, or otherwise not as expected.
+    InvalidPadding,
+}
+
+impl fmt::Display for ParseBase64Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ParseBase64Error::InvalidByte { offset, byte } => {
+                write!(f, "invalid base64 symbol {byte}, offset {offset}",)
+            }
+            ParseBase64Error::InvalidLength { length } => {
+                write!(f, "invalid base64 input length: {length}",)
+            }
+            ParseBase64Error::InvalidLastSymbol { offset, byte } => {
+                write!(
+                    f,
+                    "invalid base64 last symbol {byte}, \
+                     offset {offset}",
+                )
+            }
+            ParseBase64Error::InvalidPadding => {
+                write!(f, "invalid base64 padding")
+            }
+        }
+    }
+}
+
+impl error::Error for ParseBase64Error {}
+
+fn from_decode_error(e: base64::DecodeError) -> ParseBase64Error {
+    match e {
+        base64::DecodeError::InvalidByte(offset, byte) => {
+            ParseBase64Error::InvalidByte { offset, byte }
+        }
+        base64::DecodeError::InvalidLength(length) => {
+            ParseBase64Error::InvalidLength { length }
+        }
+        base64::DecodeError::InvalidLastSymbol(offset, byte) => {
+            ParseBase64Error::InvalidLastSymbol { offset, byte }
+        }
+        base64::DecodeError::InvalidPadding => ParseBase64Error::InvalidPadding,
+    }
+}
+
+impl FromStr for Base64Vec {
+    type Err = ParseBase64Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        base64::engine::general_purpose::STANDARD
+            .decode(s)
+            .map(Self)
+            .map_err(from_decode_error)
     }
 }
 

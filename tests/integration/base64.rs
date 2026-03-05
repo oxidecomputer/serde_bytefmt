@@ -3,7 +3,7 @@
 
 use hex_literal::hex;
 use serde::{Deserialize, Serialize};
-use serde_bytefmt::Base64Vec;
+use serde_bytefmt::{Base64Vec, ParseBase64Error};
 
 /// Test that `Base64Vec` works with `#[serde(with = "...")]`.
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
@@ -147,4 +147,38 @@ fn base64_vec_direct() {
     let roundtrip: WithBase64VecDirect =
         serde_json::from_str(&json).expect("deserialized");
     assert_eq!(fixture, roundtrip);
+}
+
+// -- FromStr tests --
+
+#[test]
+fn base64_from_str() {
+    let b: Base64Vec = "AQID".parse().expect("parsed");
+    assert_eq!(*b, [1, 2, 3]);
+
+    // With padding.
+    let b: Base64Vec = "AQIDBA==".parse().expect("parsed padded");
+    assert_eq!(*b, [1, 2, 3, 4]);
+
+    // Empty.
+    let b: Base64Vec = "".parse().expect("parsed empty");
+    assert!(b.is_empty());
+}
+
+#[test]
+fn base64_from_str_invalid_byte() {
+    let err = "AQ!D".parse::<Base64Vec>().expect_err("invalid byte");
+    assert_eq!(
+        err,
+        ParseBase64Error::InvalidByte { offset: 2, byte: b'!' },
+        "got: {err}",
+    );
+    assert!(err.to_string().contains("offset 2"), "got: {err}",);
+}
+
+#[test]
+fn base64_from_str_invalid_length() {
+    // A single base64 character is not a valid encoding.
+    let err = "A".parse::<Base64Vec>().expect_err("invalid length");
+    assert_eq!(err, ParseBase64Error::InvalidLength { length: 1 });
 }
