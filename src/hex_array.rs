@@ -3,7 +3,7 @@
 
 //! The [`HexArray`] newtype wrapper.
 
-use core::{convert::TryInto, fmt};
+use core::{convert::TryInto, fmt, fmt::Write};
 use serde_core::{
     Deserializer,
     de::{Expected, SeqAccess, Visitor},
@@ -125,6 +125,9 @@ impl<const N: usize> HexArray<N> {
 }
 
 /// Formats a byte slice as lower-case hex.
+///
+/// This is used both for serialization (via `Display`) and as the
+/// inner value in `HexArray`'s `Debug` output (via `Debug`).
 struct HexDisplay<'a>(&'a [u8]);
 
 impl fmt::Display for HexDisplay<'_> {
@@ -133,6 +136,12 @@ impl fmt::Display for HexDisplay<'_> {
             write!(f, "{byte:02x}")?;
         }
         Ok(())
+    }
+}
+
+impl fmt::Debug for HexDisplay<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(self, f)
     }
 }
 
@@ -226,17 +235,45 @@ impl<const N: usize> Expected for HexExpected<N> {
     }
 }
 
-#[cfg(feature = "alloc")]
 impl<const N: usize> fmt::Debug for HexArray<N> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "HexArray({})", hex::encode(self.0))
+        f.debug_tuple("HexArray").field(&HexDisplay(&self.0)).finish()
     }
 }
 
-#[cfg(feature = "alloc")]
 impl<const N: usize> fmt::Display for HexArray<N> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        hex::encode(self.0).fmt(f)
+        let content_len = N * 2;
+
+        match f.width() {
+            Some(width) if width > content_len => {
+                let padding = width - content_len;
+                let fill = f.fill();
+                let (pre, post) = match f.align() {
+                    Some(fmt::Alignment::Left) => (0, padding),
+                    Some(fmt::Alignment::Right) | None => (padding, 0),
+                    Some(fmt::Alignment::Center) => {
+                        (padding / 2, padding - padding / 2)
+                    }
+                };
+                for _ in 0..pre {
+                    f.write_char(fill)?;
+                }
+                for byte in &self.0 {
+                    write!(f, "{byte:02x}")?;
+                }
+                for _ in 0..post {
+                    f.write_char(fill)?;
+                }
+                Ok(())
+            }
+            Some(_) | None => {
+                for byte in &self.0 {
+                    write!(f, "{byte:02x}")?;
+                }
+                Ok(())
+            }
+        }
     }
 }
 

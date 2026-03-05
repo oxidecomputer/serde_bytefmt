@@ -20,8 +20,7 @@ and as efficient raw bytes in binary formats.
 
 ## Types
 
-* [`HexArray<N>`](https://docs.rs/serde_bytefmt/0.1.0/serde_bytefmt/hex_array/struct.HexArray.html) encodes a fixed-length byte array as a hex string. (The
-  `alloc` feature is required for serialization.)
+* [`HexArray<N>`](https://docs.rs/serde_bytefmt/0.1.0/serde_bytefmt/hex_array/struct.HexArray.html) encodes a fixed-length byte array as a hex string.
 * [`Base64Vec`](https://docs.rs/serde_bytefmt/0.1.0/serde_bytefmt/base64_vec/struct.Base64Vec.html) encodes a variable-length byte vector as a base64 string.
   (The `alloc` feature is required.)
 
@@ -57,8 +56,7 @@ struct Record {
 
 ## Features
 
-* **`alloc`**: enables [`Base64Vec`](https://docs.rs/serde_bytefmt/0.1.0/serde_bytefmt/base64_vec/struct.Base64Vec.html), as well as
-  [`HexArray`](https://docs.rs/serde_bytefmt/0.1.0/serde_bytefmt/hex_array/struct.HexArray.html) serialization. *Enabled by default.*
+* **`alloc`**: enables [`Base64Vec`](https://docs.rs/serde_bytefmt/0.1.0/serde_bytefmt/base64_vec/struct.Base64Vec.html). *Enabled by default.*
 * **`schemars08`**: derives `JsonSchema` for both types.
   *Not enabled by default.*
 

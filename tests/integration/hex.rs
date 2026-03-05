@@ -3,18 +3,19 @@
 
 use hex_literal::hex;
 use serde::{Deserialize, Serialize};
+use serde_bytefmt::HexArray;
 
 /// Test that `HexArray` works with `#[serde(with = "...")]`.
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 struct WithHexArrayAttr {
-    #[serde(with = "serde_bytefmt::HexArray::<16>")]
+    #[serde(with = "HexArray::<16>")]
     x: [u8; 16],
 }
 
 /// Test using `HexArray` directly as a field type.
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 struct WithHexArrayDirect {
-    x: serde_bytefmt::HexArray<16>,
+    x: HexArray<16>,
 }
 
 static FIXTURE: WithHexArrayAttr =
@@ -56,12 +57,12 @@ fn hex_deserialize() {
 fn hex_deserialize_from_seq() {
     #[derive(Debug, Eq, PartialEq, Deserialize)]
     struct SmallHex {
-        x: serde_bytefmt::HexArray<4>,
+        x: HexArray<4>,
     }
 
     #[derive(Debug, Eq, PartialEq, Deserialize)]
     struct SmallHexAttr {
-        #[serde(with = "serde_bytefmt::HexArray::<4>")]
+        #[serde(with = "HexArray::<4>")]
         x: [u8; 4],
     }
 
@@ -72,10 +73,7 @@ fn hex_deserialize_from_seq() {
 
     let direct: SmallHex = ciborium::de::from_reader(&cbor_array[..])
         .expect("deserialized HexArray from CBOR array");
-    assert_eq!(
-        direct,
-        SmallHex { x: serde_bytefmt::HexArray::new([1, 2, 3, 4]) },
-    );
+    assert_eq!(direct, SmallHex { x: HexArray::new([1, 2, 3, 4]) },);
 
     let with_attr: SmallHexAttr = ciborium::de::from_reader(&cbor_array[..])
         .expect(
@@ -103,7 +101,7 @@ fn hex_json_array_rejected() {
     #[derive(Debug, Deserialize)]
     struct SmallHexDirect {
         #[expect(dead_code)]
-        x: serde_bytefmt::HexArray<4>,
+        x: HexArray<4>,
     }
 
     let err = serde_json::from_str::<SmallHexDirect>(json).expect_err(
@@ -120,9 +118,7 @@ fn hex_json_array_rejected() {
 #[test]
 fn hex_array_direct() {
     let fixture = WithHexArrayDirect {
-        x: serde_bytefmt::HexArray::new(hex!(
-            "0123456789abcdef0123456789abcdef"
-        )),
+        x: HexArray::new(hex!("0123456789abcdef0123456789abcdef")),
     };
 
     let json = serde_json::to_string(&fixture).expect("serialized");
@@ -131,4 +127,52 @@ fn hex_array_direct() {
     let roundtrip: WithHexArrayDirect =
         serde_json::from_str(&json).expect("deserialized");
     assert_eq!(fixture, roundtrip);
+}
+
+// -- Display and Debug formatting tests --
+
+#[test]
+fn hex_display() {
+    let h = HexArray::new([0x01, 0x02, 0xab, 0xff]);
+    assert_eq!(format!("{h}"), "0102abff");
+
+    // Empty array.
+    let empty = HexArray::new([]);
+    assert_eq!(format!("{empty}"), "");
+
+    let h = HexArray::new([0xab, 0xcd]);
+
+    // Right alignment (the default).
+    assert_eq!(format!("{h:>10}"), "      abcd");
+    assert_eq!(format!("{h:10}"), "      abcd");
+
+    // Left alignment.
+    assert_eq!(format!("{h:<10}"), "abcd      ");
+
+    // Center alignment (even and odd padding).
+    assert_eq!(format!("{h:^10}"), "   abcd   ");
+    assert_eq!(format!("{h:^9}"), "  abcd   ");
+
+    // Custom fill character.
+    assert_eq!(format!("{h:_>10}"), "______abcd");
+    assert_eq!(format!("{h:_<10}"), "abcd______");
+    assert_eq!(format!("{h:_^10}"), "___abcd___");
+
+    // Width smaller than or equal to content: no truncation.
+    assert_eq!(format!("{h:2}"), "abcd");
+    assert_eq!(format!("{h:4}"), "abcd");
+}
+
+#[test]
+fn hex_debug() {
+    let h = HexArray::new([0x01, 0x02, 0xab, 0xff]);
+    assert_eq!(format!("{h:?}"), "HexArray(0102abff)");
+
+    // Empty array.
+    let empty = HexArray::new([]);
+    assert_eq!(format!("{empty:?}"), "HexArray()");
+
+    // Alternate flag.
+    let h = HexArray::new([0xab, 0xcd]);
+    assert_eq!(format!("{h:#?}"), "HexArray(\n    abcd,\n)");
 }

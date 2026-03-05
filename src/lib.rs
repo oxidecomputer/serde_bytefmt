@@ -50,8 +50,7 @@
 //!
 //! # Features
 //!
-//! - **`alloc`**: enables [`Base64Vec`] and [`HexArray`]
-//!   `Debug`/`Display` impls. *Enabled by default.*
+//! - **`alloc`**: enables [`Base64Vec`]. *Enabled by default.*
 //! - **`schemars08`**: derives `JsonSchema` for both types.
 //!   *Not enabled by default.*
 
