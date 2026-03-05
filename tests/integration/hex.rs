@@ -5,7 +5,7 @@ use hex_literal::hex;
 use serde::{Deserialize, Serialize};
 
 /// Test that `HexArray` works with `#[serde(with = "...")]`.
-#[derive(Copy, Clone, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 struct WithHexArrayAttr {
     #[serde(with = "serde_bytefmt::HexArray::<16>")]
     x: [u8; 16],
