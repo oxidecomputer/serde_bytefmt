@@ -76,7 +76,7 @@ different approaches from `byte-wrapper`.
 |feature|`byte-wrapper`|[`serde-human-bytes`] 0.1.2|[`serde-encoded-bytes`] 0.2.1|[`serde_with`] 3.17.0|[`hex-buffer-serde`] 0.4.0|[`hexutil`] 0.1.0|[`serde-bytes-repr`] 0.3.0|
 |-------|--------------|-------------------------|---------------------------|-------------------|------------------------|---------------|------------------------|
 |newtype wrappers|yes|yes (hex only)|no|no|no|no|no|
-|[`is_human_readable()`] switch|yes|yes|yes|**no**|yes|yes|**no**|
+|[`is_human_readable()`] switch|yes|yes|yes|no|yes|yes|no|
 |[`Display`] / [`FromStr`] / [`Deref`]|yes|[`Deref`] only|no|no|no|[`Display`] / [`FromStr`] via macro|no|
 |hex encoding|yes|yes|yes|yes|yes|yes|yes|
 |base64 encoding|yes|yes|yes|yes|no|no|yes|
