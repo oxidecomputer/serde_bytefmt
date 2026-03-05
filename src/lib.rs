@@ -69,32 +69,48 @@
 //!
 //! # Alternatives
 //!
-//! The [`serde_with`] crate provides [`Hex`] and [`Base64`] format
-//! adapters via its `serde_as` macro. These always serialize as
-//! hex/base64 strings, even in binary formats like CBOR — they do
-//! not check [`is_human_readable()`] to switch to raw bytes.
-//! `serde_with` also does not provide:
+//! Several crates solve parts of this problem, often using slightly
+//! different approaches from `byte-wrapper`.
 //!
-//! - Standalone newtype wrappers with [`Display`], [`FromStr`],
-//!   [`Deref`], etc. Its adapters only work as serde field
-//!   annotations.
-//! - [`JsonSchema`] (schemars) impls. If you derive `JsonSchema` on
-//!   a struct that uses `serde_as`, schemars won't know about the
-//!   hex/base64 encoding and will generate an incorrect schema (an
-//!   array of integers rather than a string).
+//! | feature                              | `byte-wrapper` | [`serde-human-bytes`] 0.1.2 | [`serde-encoded-bytes`] 0.2.1 | [`serde_with`] 3.17.0 | [`hex-buffer-serde`] 0.4.0 | [`hexutil`] 0.1.0                    | [`serde-bytes-repr`] 0.3.0 |
+//! |--------------------------------------|----------------|-----------------------------|-----------------------------|----------------------|----------------------------|--------------------------------------|-----------------------------|
+//! | newtype wrappers                     | yes            | yes (hex only)              | no                          | no                   | no                         | no                                   | no                          |
+//! | [`is_human_readable()`] switch       | yes            | yes                         | yes                         | **no**               | yes                        | yes                                  | **no**                      |
+//! | [`Display`] / [`FromStr`] / [`Deref`]| yes            | [`Deref`] only              | no                          | no                   | no                         | [`Display`] / [`FromStr`] via macro  | no                          |
+//! | hex encoding                         | yes            | yes                         | yes                         | yes                  | yes                        | yes                                  | yes                         |
+//! | base64 encoding                      | yes            | yes                         | yes                         | yes                  | no                         | no                                   | yes                         |
+//! | `[u8; N]` support                    | yes            | yes                         | yes                         | yes                  | yes                        | via macros                           | no                          |
+//! | `no_std`                             | yes            | yes                         | yes                         | yes                  | yes                        | yes                                  | no                          |
+//! | [`JsonSchema`] (schemars)            | yes            | no                          | no                          | yes                  | no                         | no                                   | no                          |
+//! | `#[serde(with)]` support             | yes            | yes                         | yes                         | yes                  | yes                        | no                                   | no                          |
 //!
-//! If you only need serde support for human-readable formats and
-//! don't need newtypes or schema generation, `serde_with` is a
-//! reasonable alternative.
+//! The closest alternatives are:
 //!
+//! * [`serde-human-bytes`], which provides
+//!   newtypes with [`Deref`], [`is_human_readable()`] switching,
+//!   and both hex and base64 encoding, but lacks [`Display`] /
+//!   [`FromStr`] and [`JsonSchema`] support.
+//!
+//! * [`serde-encoded-bytes`], which provides most of the features of this
+//!   crate, and is more general in some ways, but doesn't provide newtype
+//!   or schemars support.
+//!
+//! * [`serde_with`], which offers schemars integration but does not check
+//!   [`is_human_readable()`] by default.
+//!
+//! [`serde-encoded-bytes`]: https://docs.rs/serde-encoded-bytes
+//! [`hex-buffer-serde`]: https://docs.rs/hex-buffer-serde
+//! [`hexutil`]: https://docs.rs/hexutil
 //! [`serde_with`]: https://docs.rs/serde_with
-//! [`Hex`]: https://docs.rs/serde_with/latest/serde_with/hex/struct.Hex.html
-//! [`Base64`]: https://docs.rs/serde_with/latest/serde_with/base64/struct.Base64.html
+//! [`serde-bytes-repr`]: https://docs.rs/serde-bytes-repr
+//! [`serde-human-bytes`]: https://docs.rs/serde-human-bytes
 //! [`Display`]: core::fmt::Display
 //! [`FromStr`]: core::str::FromStr
 //! [`Deref`]: core::ops::Deref
 //! [`JsonSchema`]: https://docs.rs/schemars/0.8/schemars/trait.JsonSchema.html
 //! [`is_human_readable()`]: https://docs.rs/serde/latest/serde/trait.Serializer.html#method.is_human_readable
+//! [`Hex`]: https://docs.rs/serde_with/latest/serde_with/hex/struct.Hex.html
+//! [`Base64`]: https://docs.rs/serde_with/latest/serde_with/base64/struct.Base64.html
 //!
 //! # Features
 //!
