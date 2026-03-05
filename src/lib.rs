@@ -65,6 +65,35 @@
 //! # }
 //! ```
 //!
+//! # Alternatives
+//!
+//! The [`serde_with`] crate provides [`Hex`] and [`Base64`] format
+//! adapters via its `serde_as` macro. These always serialize as
+//! hex/base64 strings, even in binary formats like CBOR — they do
+//! not check [`is_human_readable()`] to switch to raw bytes.
+//! `serde_with` also does not provide:
+//!
+//! - Standalone newtype wrappers with [`Display`], [`FromStr`],
+//!   [`Deref`], etc. Its adapters only work as serde field
+//!   annotations.
+//! - [`JsonSchema`] (schemars) impls. If you derive `JsonSchema` on
+//!   a struct that uses `serde_as`, schemars won't know about the
+//!   hex/base64 encoding and will generate an incorrect schema (an
+//!   array of integers rather than a string).
+//!
+//! If you only need serde support for human-readable formats and
+//! don't need newtypes or schema generation, `serde_with` is a
+//! reasonable alternative.
+//!
+//! [`serde_with`]: https://docs.rs/serde_with
+//! [`Hex`]: https://docs.rs/serde_with/latest/serde_with/hex/struct.Hex.html
+//! [`Base64`]: https://docs.rs/serde_with/latest/serde_with/base64/struct.Base64.html
+//! [`Display`]: core::fmt::Display
+//! [`FromStr`]: core::str::FromStr
+//! [`Deref`]: core::ops::Deref
+//! [`JsonSchema`]: https://docs.rs/schemars/0.8/schemars/trait.JsonSchema.html
+//! [`is_human_readable()`]: https://docs.rs/serde/latest/serde/trait.Serializer.html#method.is_human_readable
+//!
 //! # Features
 //!
 //! - **`alloc`**: enables [`Base64Vec`]. *Enabled by default.*
