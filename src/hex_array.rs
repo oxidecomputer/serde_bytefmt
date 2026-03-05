@@ -378,13 +378,13 @@ mod serde_impls {
                 {
                     // Reject early if the sequence reports a
                     // wrong length.
-                    if let Some(len) = seq.size_hint() {
-                        if len != N {
-                            return Err(Error::invalid_length(
-                                len,
-                                &HexExpected::<N>,
-                            ));
-                        }
+                    if let Some(len) = seq.size_hint()
+                        && len != N
+                    {
+                        return Err(Error::invalid_length(
+                            len,
+                            &HexExpected::<N>,
+                        ));
                     }
                     let mut out = [0u8; N];
                     for (i, byte) in out.iter_mut().enumerate() {
