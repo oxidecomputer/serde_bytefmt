@@ -523,6 +523,9 @@ mod schemars_impls {
                     max_length: Some(hex_len as u32),
                     pattern: Some(format!("^[0-9a-fA-F]{{{hex_len}}}$")),
                 })),
+                extensions: crate::x_rust_type_extension(&format!(
+                    "HexArray::<{N}>"
+                )),
                 ..Default::default()
             })
         }

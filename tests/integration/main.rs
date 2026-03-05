@@ -13,3 +13,5 @@ mod hex;
 mod hex_schemars;
 #[cfg(all(feature = "hex", feature = "serde"))]
 mod hex_serde;
+#[cfg(feature = "schemars08")]
+mod typify_roundtrip;
