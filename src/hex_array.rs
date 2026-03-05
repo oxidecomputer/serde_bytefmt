@@ -4,7 +4,6 @@
 //! The [`HexArray`] newtype wrapper.
 
 use core::{
-    convert::TryInto,
     error,
     fmt::{self, Write},
     str::FromStr,
