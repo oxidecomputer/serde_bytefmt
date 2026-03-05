@@ -3,6 +3,6 @@ sign-tag = true
 consolidate-commits = false
 pre-release-commit-message = "version {{version}}"
 tag-message = "version {{version}}"
-tag-name = "serde_bytefmt-{{version}}"
+tag-name = "byte-wrapper-{{version}}"
 publish = false
 pre-release-hook = ["just", "generate-readmes"]

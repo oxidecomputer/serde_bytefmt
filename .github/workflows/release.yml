@@ -4,7 +4,7 @@ name: Publish releases to GitHub
 on:
   push:
     tags:
-      - "serde_bytefmt-[0-9]*"
+      - "byte-wrapper-[0-9]*"
 
 jobs:
   release:
@@ -28,7 +28,7 @@ jobs:
           tool: cargo-release@0.25.17,just
       - uses: taiki-e/create-gh-release-action@26b80501670402f1999aff4b934e1574ef2d3705 # v1
         with:
-          prefix: serde_bytefmt
+          prefix: byte-wrapper
           changelog: CHANGELOG.md
           title: $prefix $version
           branch: main

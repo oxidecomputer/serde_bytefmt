@@ -1,6 +1,6 @@
 [package]
 name = "byte-wrapper"
-description = "Newtype wrappers for byte arrays and vectors with hex and base64 formatting."
+description = "Newtype wrappers for hex byte arrays and base64 vectors, with serde and schemars support."
 version = "0.1.0"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/oxidecomputer/byte-wrapper"
@@ -8,7 +8,16 @@ documentation = "https://docs.rs/byte-wrapper"
 edition = "2024"
 rust-version = "1.88"
 keywords = ["bytes", "hex", "base64", "serde", "no_std"]
-categories = ["encoding", "no-std"]
+categories = ["encoding", "no-std::no-alloc"]
+include = [
+    "src/**/*",
+    "tests/**/*",
+    "Cargo.toml",
+    "CHANGELOG.md",
+    "LICENSE-APACHE",
+    "LICENSE-MIT",
+    "README.md",
+]
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ["cfg(doc_cfg)"] }

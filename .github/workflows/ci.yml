@@ -89,7 +89,7 @@ jobs:
       - name: Build rustdoc
         run: just rustdoc
       - name: Add redirect to crate docs
-        run: echo '<meta http-equiv="refresh" content="0; url=serde_bytefmt/index.html">' > target/doc/index.html
+        run: echo '<meta http-equiv="refresh" content="0; url=byte_wrapper/index.html">' > target/doc/index.html
       - name: Configure GitHub Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
       - name: Upload artifact
