@@ -498,6 +498,7 @@ mod serde_impls {
 #[cfg(feature = "schemars08")]
 mod schemars_impls {
     use super::HexArray;
+    use crate::schemars_util::x_rust_type_extension;
     use alloc::{boxed::Box, format, string::String};
     use schemars08::{
         JsonSchema,
@@ -523,9 +524,7 @@ mod schemars_impls {
                     max_length: Some(hex_len as u32),
                     pattern: Some(format!("^[0-9a-fA-F]{{{hex_len}}}$")),
                 })),
-                extensions: crate::x_rust_type_extension(&format!(
-                    "HexArray::<{N}>"
-                )),
+                extensions: x_rust_type_extension(&format!("HexArray::<{N}>")),
                 ..Default::default()
             })
         }

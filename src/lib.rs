@@ -134,27 +134,10 @@ extern crate alloc;
 mod base64_vec;
 #[cfg(feature = "hex")]
 mod hex_array;
+#[cfg(all(feature = "schemars08", any(feature = "base64", feature = "hex")))]
+mod schemars_util;
 
 #[cfg(feature = "base64")]
 pub use base64_vec::{Base64Vec, ParseBase64Error};
 #[cfg(feature = "hex")]
 pub use hex_array::{HexArray, ParseHexError};
-
-/// Build a schemars extensions map containing the `x-rust-type` entry for
-/// the given type name. The version is the earliest semver-compatible
-/// release of this crate; update it only on breaking changes.
-#[cfg(feature = "schemars08")]
-pub(crate) fn x_rust_type_extension(
-    type_name: &str,
-) -> schemars08::Map<alloc::string::String, serde_json::Value> {
-    [(
-        "x-rust-type".into(),
-        serde_json::json!({
-            "crate": "byte-wrapper",
-            "version": "0.1.0",
-            "path": alloc::format!("byte_wrapper::{type_name}"),
-        }),
-    )]
-    .into_iter()
-    .collect()
-}
