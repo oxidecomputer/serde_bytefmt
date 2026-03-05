@@ -3,8 +3,6 @@
 
 //! The [`Base64Vec`] newtype wrapper.
 
-extern crate alloc;
-
 use alloc::vec::Vec;
 use base64::Engine;
 use core::{error, fmt, str::FromStr};
