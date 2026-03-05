@@ -20,13 +20,14 @@
 //! # Types
 //!
 //! * [`HexArray<N>`] encodes a fixed-length byte array as a hex
-//!   string.
+//!   string. (Requires the `hex` feature.)
 //! * [`Base64Vec`] encodes a variable-length byte vector as a base64
-//!   string. (The `alloc` feature is required.)
+//!   string. (Requires the `base64` feature.)
 //!
 //! # Examples
 //!
 //! ```
+//! # #[cfg(feature = "hex")] {
 //! use byte_wrapper::HexArray;
 //!
 //! let h = HexArray::new([0x01, 0x02, 0xab, 0xff]);
@@ -34,12 +35,13 @@
 //!
 //! let parsed: HexArray<4> = "0102abff".parse().unwrap();
 //! assert_eq!(parsed, h);
+//! # }
 //! ```
 //!
 //! With the **`serde`** feature:
 //!
 //! ```
-//! # #[cfg(feature = "serde")] {
+//! # #[cfg(all(feature = "hex", feature = "serde"))] {
 //! use byte_wrapper::HexArray;
 //! use serde::{Deserialize, Serialize};
 //!
@@ -53,7 +55,7 @@
 //! Using `#[serde(with = "...")]` on an existing byte array:
 //!
 //! ```
-//! # #[cfg(feature = "serde")] {
+//! # #[cfg(all(feature = "hex", feature = "serde"))] {
 //! use byte_wrapper::HexArray;
 //! use serde::{Deserialize, Serialize};
 //!
@@ -96,10 +98,13 @@
 //!
 //! # Features
 //!
-//! - **`alloc`**: enables [`Base64Vec`]. *Enabled by default.*
-//! - **`serde`**: implements `Serialize` and `Deserialize` for both
-//!   types. *Not enabled by default.*
-//! - **`schemars08`**: derives `JsonSchema` for both types.
+//! - **`hex`**: enables [`HexArray`]. *Enabled by default.*
+//! - **`base64`**: enables [`Base64Vec`] (implies `alloc`).
+//!   *Enabled by default.*
+//! - **`alloc`**: enables `alloc` support (required by `base64`).
+//! - **`serde`**: implements `Serialize` and `Deserialize` for
+//!   enabled types. *Not enabled by default.*
+//! - **`schemars08`**: derives `JsonSchema` for enabled types.
 //!   *Not enabled by default.*
 
 #![deny(missing_docs)]
@@ -109,10 +114,12 @@
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
-#[cfg(feature = "alloc")]
+#[cfg(feature = "base64")]
 mod base64_vec;
+#[cfg(feature = "hex")]
 mod hex_array;
 
-#[cfg(feature = "alloc")]
+#[cfg(feature = "base64")]
 pub use base64_vec::{Base64Vec, ParseBase64Error};
+#[cfg(feature = "hex")]
 pub use hex_array::{HexArray, ParseHexError};

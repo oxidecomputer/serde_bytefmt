@@ -35,13 +35,12 @@ fn fixture() -> WithBase64VecAttr {
 fn base64_serde_roundtrip() {
     let fixture = fixture();
 
-    let json = serde_json::to_string(&fixture)
-        .expect("serializing as JSON succeeded");
+    let json =
+        serde_json::to_string(&fixture).expect("serializing as JSON succeeded");
     assert_eq!(json, AS_JSON, "JSON matched");
 
-    let json_roundtrip: WithBase64VecAttr =
-        serde_json::from_str(&json)
-            .expect("JSON roundtrip deserialization succeeded");
+    let json_roundtrip: WithBase64VecAttr = serde_json::from_str(&json)
+        .expect("JSON roundtrip deserialization succeeded");
     assert_eq!(fixture, json_roundtrip, "JSON roundtrip matched");
 
     let mut cbor = Vec::new();

@@ -27,9 +27,9 @@ refer to them via `#[serde(with = "...")]` instead.
 ## Types
 
 * [`HexArray<N>`](https://docs.rs/byte-wrapper/0.1.0/byte_wrapper/hex_array/struct.HexArray.html) encodes a fixed-length byte array as a hex
-  string.
+  string. (Requires the `hex` feature.)
 * [`Base64Vec`](https://docs.rs/byte-wrapper/0.1.0/byte_wrapper/base64_vec/struct.Base64Vec.html) encodes a variable-length byte vector as a base64
-  string. (The `alloc` feature is required.)
+  string. (Requires the `base64` feature.)
 
 ## Examples
 
@@ -71,9 +71,10 @@ struct Record {
 ## Alternatives
 
 The [`serde_with`] crate provides [`Hex`] and [`Base64`] format
-adapters via its `serde_as` macro. These handle the same
-human-readable-vs-binary serde distinction that this crate does.
-However, `serde_with` does not provide:
+adapters via its `serde_as` macro. These always serialize as
+hex/base64 strings, even in binary formats like CBOR — they do
+not check [`is_human_readable()`] to switch to raw bytes.
+`serde_with` also does not provide:
 
 * Standalone newtype wrappers with [`Display`], [`FromStr`],
   [`Deref`], etc. Its adapters only work as serde field
@@ -83,21 +84,26 @@ However, `serde_with` does not provide:
   hex/base64 encoding and will generate an incorrect schema (an
   array of integers rather than a string).
 
-If you only need serde support and don’t need newtypes or schema
-generation, `serde_with` is a good choice.
+If you only need serde support for human-readable formats and
+don’t need newtypes or schema generation, `serde_with` is a
+reasonable alternative.
 
 ## Features
 
-* **`alloc`**: enables [`Base64Vec`](https://docs.rs/byte-wrapper/0.1.0/byte_wrapper/base64_vec/struct.Base64Vec.html). *Enabled by default.*
-* **`serde`**: implements `Serialize` and `Deserialize` for both
-  types. *Not enabled by default.*
-* **`schemars08`**: derives `JsonSchema` for both types.
+* **`hex`**: enables [`HexArray`](https://docs.rs/byte-wrapper/0.1.0/byte_wrapper/hex_array/struct.HexArray.html). *Enabled by default.*
+* **`base64`**: enables [`Base64Vec`](https://docs.rs/byte-wrapper/0.1.0/byte_wrapper/base64_vec/struct.Base64Vec.html) (implies `alloc`).
+  *Enabled by default.*
+* **`alloc`**: enables `alloc` support (required by `base64`).
+* **`serde`**: implements `Serialize` and `Deserialize` for
+  enabled types. *Not enabled by default.*
+* **`schemars08`**: derives `JsonSchema` for enabled types.
   *Not enabled by default.*
 
 [CBOR]: https://cbor.io/
 [`serde_with`]: https://docs.rs/serde_with
 [`Hex`]: https://docs.rs/serde_with/latest/serde_with/hex/struct.Hex.html
 [`Base64`]: https://docs.rs/serde_with/latest/serde_with/base64/struct.Base64.html
+[`is_human_readable()`]: https://docs.rs/serde/latest/serde/trait.Serializer.html#method.is_human_readable
 [`Display`]: https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html
 [`FromStr`]: https://doc.rust-lang.org/nightly/core/str/traits/trait.FromStr.html
 [`Deref`]: https://doc.rust-lang.org/nightly/core/ops/deref/trait.Deref.html

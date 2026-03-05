@@ -26,13 +26,12 @@ static AS_CBOR: [u8; 20] = hex!("a16178500123456789abcdef0123456789abcdef");
 
 #[test]
 fn hex_serde_roundtrip() {
-    let json = serde_json::to_string(&FIXTURE)
-        .expect("serializing as JSON succeeded");
+    let json =
+        serde_json::to_string(&FIXTURE).expect("serializing as JSON succeeded");
     assert_eq!(json, AS_JSON, "JSON matched");
 
-    let json_roundtrip: WithHexArrayAttr =
-        serde_json::from_str(&json)
-            .expect("JSON roundtrip deserialization succeeded");
+    let json_roundtrip: WithHexArrayAttr = serde_json::from_str(&json)
+        .expect("JSON roundtrip deserialization succeeded");
     assert_eq!(FIXTURE, json_roundtrip, "JSON roundtrip matched");
 
     let mut cbor = Vec::new();
@@ -40,9 +39,8 @@ fn hex_serde_roundtrip() {
         .expect("serializing as CBOR succeeded");
     assert_eq!(cbor, AS_CBOR, "CBOR matched");
 
-    let cbor_roundtrip: WithHexArrayAttr =
-        ciborium::de::from_reader(&cbor[..])
-            .expect("CBOR roundtrip deserialization succeeded");
+    let cbor_roundtrip: WithHexArrayAttr = ciborium::de::from_reader(&cbor[..])
+        .expect("CBOR roundtrip deserialization succeeded");
     assert_eq!(FIXTURE, cbor_roundtrip, "CBOR roundtrip matched");
 }
 
