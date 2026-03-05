@@ -374,6 +374,7 @@ mod serde_impls {
 #[cfg(feature = "schemars08")]
 mod schemars_impls {
     use super::Base64Vec;
+    use crate::schemars_util::x_rust_type_extension;
     use alloc::string::String;
     use schemars08::{
         JsonSchema,
@@ -391,12 +392,12 @@ mod schemars_impls {
         }
 
         fn json_schema(_generator: &mut SchemaGenerator) -> Schema {
+            let mut extensions = x_rust_type_extension("Base64Vec");
+            extensions.insert("contentEncoding".into(), "base64".into());
             Schema::Object(SchemaObject {
                 instance_type: Some(InstanceType::String.into()),
                 format: Some("byte".into()),
-                extensions: [("contentEncoding".into(), "base64".into())]
-                    .into_iter()
-                    .collect(),
+                extensions,
                 ..Default::default()
             })
         }

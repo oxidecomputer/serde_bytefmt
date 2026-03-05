@@ -378,13 +378,13 @@ mod serde_impls {
                 {
                     // Reject early if the sequence reports a
                     // wrong length.
-                    if let Some(len) = seq.size_hint() {
-                        if len != N {
-                            return Err(Error::invalid_length(
-                                len,
-                                &HexExpected::<N>,
-                            ));
-                        }
+                    if let Some(len) = seq.size_hint()
+                        && len != N
+                    {
+                        return Err(Error::invalid_length(
+                            len,
+                            &HexExpected::<N>,
+                        ));
                     }
                     let mut out = [0u8; N];
                     for (i, byte) in out.iter_mut().enumerate() {
@@ -498,6 +498,7 @@ mod serde_impls {
 #[cfg(feature = "schemars08")]
 mod schemars_impls {
     use super::HexArray;
+    use crate::schemars_util::x_rust_type_extension;
     use alloc::{boxed::Box, format, string::String};
     use schemars08::{
         JsonSchema,
@@ -523,6 +524,7 @@ mod schemars_impls {
                     max_length: Some(hex_len as u32),
                     pattern: Some(format!("^[0-9a-fA-F]{{{hex_len}}}$")),
                 })),
+                extensions: x_rust_type_extension(&format!("HexArray::<{N}>")),
                 ..Default::default()
             })
         }

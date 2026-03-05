@@ -14,7 +14,12 @@ fn hex_array_schema() {
         "type": "string",
         "maxLength": 32,
         "minLength": 32,
-        "pattern": "^[0-9a-fA-F]{32}$"
+        "pattern": "^[0-9a-fA-F]{32}$",
+        "x-rust-type": {
+            "crate": "byte-wrapper",
+            "version": "0.1.0",
+            "path": "byte_wrapper::HexArray::<16>"
+        }
     });
     assert_eq!(actual, expected);
 }
@@ -46,7 +51,12 @@ fn with_hex_array_attr() {
                 "type": "string",
                 "maxLength": 32,
                 "minLength": 32,
-                "pattern": "^[0-9a-fA-F]{32}$"
+                "pattern": "^[0-9a-fA-F]{32}$",
+                "x-rust-type": {
+                    "crate": "byte-wrapper",
+                    "version": "0.1.0",
+                    "path": "byte_wrapper::HexArray::<16>"
+                }
             }
         }
     });
@@ -67,7 +77,12 @@ fn with_hex_array_direct() {
                 "type": "string",
                 "maxLength": 32,
                 "minLength": 32,
-                "pattern": "^[0-9a-fA-F]{32}$"
+                "pattern": "^[0-9a-fA-F]{32}$",
+                "x-rust-type": {
+                    "crate": "byte-wrapper",
+                    "version": "0.1.0",
+                    "path": "byte_wrapper::HexArray::<16>"
+                }
             }
         }
     });
