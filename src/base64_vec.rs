@@ -275,8 +275,8 @@ mod serde_impls {
                 where
                     A: SeqAccess<'de2>,
                 {
-                    let mut out =
-                        Vec::with_capacity(seq.size_hint().unwrap_or(0));
+                    let hint = seq.size_hint().unwrap_or(0);
+                    let mut out = Vec::with_capacity(hint.min(4096));
                     while let Some(byte) = seq.next_element()? {
                         out.push(byte);
                     }
