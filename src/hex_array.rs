@@ -184,6 +184,13 @@ where
             where
                 E: Error,
             {
+                let expected_len = N * 2;
+                if data.len() != expected_len {
+                    return Err(E::invalid_length(
+                        data.len(),
+                        &HexStrExpected::<N>,
+                    ));
+                }
                 let mut out = [0u8; N];
                 hex::decode_to_slice(data, &mut out).map_err(Error::custom)?;
                 Ok(out)
@@ -232,6 +239,14 @@ struct HexExpected<const N: usize>;
 impl<const N: usize> Expected for HexExpected<N> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "a byte array [u8; {}]", N)
+    }
+}
+
+struct HexStrExpected<const N: usize>;
+
+impl<const N: usize> Expected for HexStrExpected<N> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "a hex string {} characters long", N * 2)
     }
 }
 

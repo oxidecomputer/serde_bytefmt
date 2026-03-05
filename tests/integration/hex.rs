@@ -129,6 +129,31 @@ fn hex_array_direct() {
     assert_eq!(fixture, roundtrip);
 }
 
+/// Verify that hex strings with wrong lengths produce clear error
+/// messages that include the expected length.
+#[test]
+fn hex_wrong_length_rejected() {
+    // Too short.
+    let json = r#"{"x":"0102"}"#;
+    let err = serde_json::from_str::<WithHexArrayAttr>(json)
+        .expect_err("too-short hex should be rejected");
+    let msg = err.to_string();
+    assert!(
+        msg.contains("32 characters"),
+        "error should mention expected length, got: {msg}",
+    );
+
+    // Too long.
+    let json = format!(r#"{{"x":"{}"}}"#, "ab".repeat(20),);
+    let err = serde_json::from_str::<WithHexArrayAttr>(&json)
+        .expect_err("too-long hex should be rejected");
+    let msg = err.to_string();
+    assert!(
+        msg.contains("32 characters"),
+        "error should mention expected length, got: {msg}",
+    );
+}
+
 // -- Display and Debug formatting tests --
 
 #[test]
