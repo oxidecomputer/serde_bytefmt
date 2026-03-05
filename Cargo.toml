@@ -32,14 +32,16 @@ pre-release-replacements = [
 ]
 
 [features]
-default = ["alloc"]
-alloc = ["dep:base64", "hex/alloc", "serde_core?/alloc"]
-serde = ["dep:serde_core"]
+default = ["base64", "hex"]
+alloc = ["serde_core?/alloc"]
+base64 = ["alloc", "dep:base64"]
+hex = ["dep:hex"]
 schemars08 = ["alloc", "dep:schemars08"]
+serde = ["dep:serde_core"]
 
 [dependencies]
 base64 = { version = "0.22", optional = true }
-hex = { version = "0.4", default-features = false }
+hex = { version = "0.4", default-features = false, optional = true }
 schemars08 = { package = "schemars", version = "0.8", optional = true }
 serde_core = { version = "1", default-features = false, optional = true }
 
