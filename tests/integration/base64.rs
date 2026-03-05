@@ -5,12 +5,6 @@ use hex_literal::hex;
 use serde::{Deserialize, Serialize};
 use serde_bytefmt::Base64Vec;
 
-#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
-struct MyStruct {
-    #[serde(with = "Base64Vec")]
-    data: Vec<u8>,
-}
-
 /// Test that `Base64Vec` works with `#[serde(with = "...")]`.
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 struct WithBase64VecAttr {
@@ -33,8 +27,8 @@ static AS_JSON: &str = r#"{"data":"ASNFZ4mrze8BI0VniavN7w=="}"#;
 static AS_CBOR: [u8; 23] =
     hex!("a1646461746150 0123456789abcdef0123456789abcdef");
 
-fn fixture() -> MyStruct {
-    MyStruct { data: FIXTURE.to_vec() }
+fn fixture() -> WithBase64VecAttr {
+    WithBase64VecAttr { data: FIXTURE.to_vec() }
 }
 
 #[test]
@@ -58,12 +52,13 @@ fn base64_serialize() {
 fn base64_deserialize() {
     let fixture = fixture();
 
-    let json_actual: MyStruct = serde_json::from_str(AS_JSON)
+    let json_actual: WithBase64VecAttr = serde_json::from_str(AS_JSON)
         .expect("deserializing from JSON succeeded");
     assert_eq!(fixture, json_actual, "deserializing from JSON matched");
 
-    let cbor_actual: MyStruct = ciborium::de::from_reader(&AS_CBOR[..])
-        .expect("deserializing from CBOR succeeded");
+    let cbor_actual: WithBase64VecAttr =
+        ciborium::de::from_reader(&AS_CBOR[..])
+            .expect("deserializing from CBOR succeeded");
     assert_eq!(fixture, cbor_actual, "deserializing from CBOR succeeded");
 }
 

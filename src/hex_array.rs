@@ -49,7 +49,7 @@ use serde_core::{
 /// }
 /// # }
 /// ```
-#[derive(Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct HexArray<const N: usize>(pub [u8; N]);
 
 impl<const N: usize> Default for HexArray<N> {
@@ -177,18 +177,6 @@ where
             }
 
             fn visit_str<E>(self, data: &str) -> Result<Self::Value, E>
-            where
-                E: Error,
-            {
-                let mut out = [0u8; N];
-                hex::decode_to_slice(data, &mut out).map_err(Error::custom)?;
-                Ok(out)
-            }
-
-            fn visit_borrowed_str<E>(
-                self,
-                data: &'de2 str,
-            ) -> Result<Self::Value, E>
             where
                 E: Error,
             {

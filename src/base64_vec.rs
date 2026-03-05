@@ -47,7 +47,7 @@ use serde_core::{
 ///     data: Vec<u8>,
 /// }
 /// ```
-#[derive(Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Base64Vec(pub Vec<u8>);
 
 impl Base64Vec {
@@ -152,18 +152,6 @@ where
             }
 
             fn visit_str<E>(self, data: &str) -> Result<Self::Value, E>
-            where
-                E: Error,
-            {
-                base64::engine::general_purpose::STANDARD
-                    .decode(data)
-                    .map_err(Error::custom)
-            }
-
-            fn visit_borrowed_str<E>(
-                self,
-                data: &'de2 str,
-            ) -> Result<Self::Value, E>
             where
                 E: Error,
             {
